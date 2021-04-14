@@ -1,6 +1,7 @@
 ---
 title: "individual2"
 output: html_document
+author: Mario Lloyd Galvao-Wilson
 ---
 
 ```{r setup, include=FALSE}
@@ -37,7 +38,8 @@ q3 <- fatal %>%
   group_by(STATE, MAKE) %>%
   summarise(nf = n())
 
-danger <- q3 %>%
+danger <- q3 %>% 
+  na.omit() %>%
   group_by(STATE) %>%
   filter(nf == max(nf))
 ```

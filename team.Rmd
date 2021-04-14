@@ -1,0 +1,43 @@
+---
+title: "Lab 5 Team Document"
+output: html_document
+author: Mario Lloyd Galvao-Wilson, Justin Park, and Brian Sayre
+---
+
+
+### Data Input and Libraries
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+
+acc <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/accident.csv", stringsAsFactors = FALSE)
+
+prsn <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/person.csv", stringsAsFactors = FALSE)
+```
+
+### Question 1
+```{r}
+acc$Weekday <- wday(acc$DAY_WEEK, label = T)
+
+acc %>%
+  ggplot(aes(Weekday)) + geom_bar()
+```
+
+### Question 2
+```{r}
+fatal <- prsn %>%
+  filter(INJ_SEV == 4)
+```
+
+### Question 3
+```{r}
+q3 <- fatal %>%
+  group_by(STATE, MAKE) %>%
+  summarise(nf = n())
+
+danger <- q3 %>% 
+  na.omit() %>%
+  group_by(STATE) %>%
+  filter(nf == max(nf))
+```
