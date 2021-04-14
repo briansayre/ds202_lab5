@@ -10,19 +10,34 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 library(ggplot2)
+library(lubridate)
 
 acc <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/accident.csv", stringsAsFactors = FALSE)
 
 prsn <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/person.csv", stringsAsFactors = FALSE)
 ```
+
 Q1
 ```{r}
-acc %>%
-  ggplot(aes(DAY_WEEK)) + geom_bar()
+acc$Weekday <- wday(acc$DAY_WEEK, label = T)
 
+acc %>%
+  ggplot(aes(Weekday)) + geom_bar()
 ```
+
 Q2
 ```{r}
 fatal <- prsn %>%
   filter(INJ_SEV == 4)
+```
+
+Q3
+```{r}
+q3 <- fatal %>%
+  group_by(STATE, MAKE) %>%
+  summarise(nf = n())
+
+danger <- q3 %>%
+  group_by(STATE) %>%
+  filter(nf == max(nf))
 ```
