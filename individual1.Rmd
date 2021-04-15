@@ -9,16 +9,19 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{R}
 library(dplyr)
 library(ggplot2)
 library(readxl)
 library(tidyverse)
 library(lubridate)
 library(maps)
+```
 
 ```{R}
 acc <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/accident.csv", stringsAsFactors = FALSE)
 person <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/person.csv", stringsAsFactors = FALSE)
+glc <- read_xlsx("FRPP_GLC_-_United_StATESaPRIL62021.xlsx")
 ```
 
 Problem 7
@@ -26,6 +29,26 @@ Problem 7
 myvars <- c("STATE", "COUNTY", "CITY", "FATALS")
 fatalities <- acc[myvars]
 
+glc$'State Code' <- as.numeric(glc$`State Code`)
+glc$'City Code' <- as.numeric(glc$`City Code`)
+glc$'County Code' <- as.numeric(glc$`County Code`)
+
+fatalities <- fatalities %>% left_join(glc, by=c('COUNTY' = 'County Code', 'STATE' = 'State Code'))
+
+fatalities$`State Name` <- tolower(fatalities$`State Name`)
+fatalities$`County Name` <- tolower(fatalities$`County Name`)
+
+#myvarstwo <- c("STATE","COUNTY" , "FATALS", "County Name", "State Name")
+#newfatalities <- fatalities[myvarstwo]
+
+#newfatalities <- unique(newfatalities)
+
+fatalities <- fatalities %>% right_join(counties, by=c('County Name' = 'subregion', 'State Name' = 'region'))
+
 states <- map_data('state')
+counties <- map_data('county')
 ggplot(states, aes(x=long, y=lat)) + geom_path(aes(group=group))
+
+ggplot(fatalities, aes(x=long, y=lat)) + 
+  geom_polygon(aes(group=group, fill=FATALS))
 ```
