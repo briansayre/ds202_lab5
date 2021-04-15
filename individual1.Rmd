@@ -9,4 +9,23 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+library(dplyr)
+library(ggplot2)
+library(readxl)
+library(tidyverse)
+library(lubridate)
+library(maps)
 
+```{R}
+acc <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/accident.csv", stringsAsFactors = FALSE)
+person <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/person.csv", stringsAsFactors = FALSE)
+```
+
+Problem 7
+```{R}
+myvars <- c("STATE", "COUNTY", "CITY", "FATALS")
+fatalities <- acc[myvars]
+
+states <- map_data('state')
+ggplot(states, aes(x=long, y=lat)) + geom_path(aes(group=group))
+```
