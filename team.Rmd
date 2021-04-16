@@ -173,14 +173,28 @@ ggplot(summerFatal, aes(x=long, y=lat, fill = FATALS)) +
   geom_polygon(aes(group = group)) +
   labs(title = "Car Accidents in the Summer by State")
 
+<<<<<<< HEAD
 winterFatal <- winterFatal %>% left_join(glc2, by=c('STATE' = 'State Code'))
+=======
+ggplot(data = summerFatal, aes(x=`State Name`, y=FATALS)) + geom_bar(stat = 'identity') + labs(title = "Accidents by State in the Summer", y = "Number of Fatalities")+ 
+  theme(axis.text.x = element_text(angle = -90, vjust = 0, hjus=0))
+
+winterFatal <- winterFatal %>% left_join(glc, by=c('STATE' = 'State Code'))
+>>>>>>> 8aaaa27e8780169a45394db84fce37517debac9c
 winterFatal$`State Name` <- tolower(winterFatal$`State Name`)
 winterFatal <- winterFatal %>% right_join(states, by=c('State Name' = 'region'))
 
 winterFatal <- winterFatal[myvarstwo]
 
+<<<<<<< HEAD
 ggplot(winterFatal, aes(x=long, y=lat, fill = FATALS)) +
   geom_polygon(aes(group = group)) +
   labs(title = "Car Accidents in the Winter by State")
+=======
+winterFatal <- unique(winterFatal)
+
+ggplot(data = winterFatal, aes(x=`State Name`, y=FATALS)) + geom_bar(stat = 'identity') + labs(title = "Accidents by State in the Winter", y = "Number of Fatalities") + 
+  theme(axis.text.x = element_text(angle = -90, vjust = 0, hjus=0)) 
+>>>>>>> 8aaaa27e8780169a45394db84fce37517debac9c
 ```
 I declared winter as October through March and summer as May through August. Winter seems to be more dangerous since there are more car accidents in each state in the Winter. In general whether it is summer or winter, the same states tend to have the most and the least number of fatal car accidents. Texas and California have the most fatal car accidents which makes sense since they are the largest states and there is more traffic. The states with the least number of fatal car accidents are mostly in less populated states such as Montana and Wyoming.
