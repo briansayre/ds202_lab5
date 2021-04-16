@@ -21,8 +21,10 @@ prsn <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/maste
 acc$Weekday <- wday(acc$DAY_WEEK, label = T)
 
 acc %>%
-  ggplot(aes(Weekday)) + geom_bar()
+  ggplot(aes(Weekday)) + geom_bar() + ylab('Number of Accidents') + ggtitle('Accidents per Day of the Week')
 ```
+
+The most accidents occur on Fridays, Saturdays, and Sundays. Saturdays have the most accidents of any day of the week, which the number of accidents on Fridays and Sundays are comparable. 
 
 ### Question 2
 ```{r}
@@ -65,6 +67,7 @@ states %>% ggplot() +
                 color="grey", fill="black" ) + geom_text(data=labels, aes(label = MAKE, x=long, y=lat), color="white", size=3)
 
 ```
+
 From the map that we made I see a trend where the most dangerous cars in the East tend to be Chevy and as you go more West it starts to shift to Ford. Overall I think there is more Chevy than Ford on this map.
 
 ### Question 5
@@ -98,6 +101,7 @@ ggplot(grouped,aes(x=HOUR, y=numAccidents)) +
   xlab("Hours of the day") + 
   ylab("Total number of accidents")
 ```
+
 In terms of sex I found that both men and women accidents are the most common and men are right behind. You can see that women is much lower than both other categories. In terms of the hour of the day we can see that accidents usually peak later at night and really dip in the mornings.
 
 ### Question 7
