@@ -121,11 +121,14 @@ glc$'City Code' <- as.numeric(glc$`City Code`)
 glc$'County Code' <- as.numeric(glc$`County Code`)
 
 fatalities <- fatalities %>%
-  group_by(STATE) %>%
-  group_by(COUNTY) %>%
+  group_by(STATE, COUNTY) %>%
   summarize(FATALS = sum(FATALS))
 
-fatalities <- fatalities %>% left_join(glc, by=c('COUNTY' = 'County Code'))
+fatalities <- fatalities %>% left_join(glc, by=c('COUNTY' = 'County Code', 'STATE' = 'State Code'))
+
+myvars2 <- c("State Name", "County Name", "FATALS")
+fatalities <- fatalities[myvars2]
+fatalities <- unique(fatalities)
 
 fatalities$`State Name` <- tolower(fatalities$`State Name`)
 fatalities$`County Name` <- tolower(fatalities$`County Name`)
@@ -137,7 +140,7 @@ ggplot(fatalities, aes(x=long, y=lat)) +
   geom_polygon(aes(group=group, fill=FATALS))
 ```
 
-There are some large areas on the map that have "holes" where there have been no reported fatal car accidents. This makes sense since certain parts of the country do not have a lot of traffic such as mountains in Colorado, New Mexico, and Arizona. You would also not expect to see many fatal car accidents in cities since people do not drive very fast in areas there is a lot of traffic.
+The plot shown mainly has three main colors (Grey, Dark Blue, and Light Blue). The grey areas are places that have no recorded fatal car accidents in the data. The dark blue shows areas with minimal amounts of fatalities and light blue shows the most number of fatal car accidents. The place with the most number of fatalities is Southern California which makes sense since there is a lot of fast car traffic and many highways where fatal car accidents can occur.
 
 ### Question 8
 ```{R}
@@ -147,6 +150,10 @@ Winter <- acc %>%
 Summer <- acc %>%
           filter(MONTH > 4 & MONTH < 9)
 
+myvars3 <- c("State Name", "State Code")
+glc2 <- glc[myvars3]
+glc2 <- unique(glc2)
+
 winterFatal <- Winter %>%
   group_by(STATE) %>%
   summarize(FATALS = sum(FATALS))
@@ -155,26 +162,25 @@ summerFatal <- Summer %>%
   group_by(STATE) %>%
   summarize(FATALS = sum(FATALS))
 
-summerFatal <- summerFatal %>% left_join(glc, by=c('STATE' = 'State Code'))
+summerFatal <- summerFatal %>% left_join(glc2, by=c('STATE' = 'State Code'))
 summerFatal$`State Name` <- tolower(summerFatal$`State Name`)
-summerFatal <- summerFatal %>% left_join(states, by=c('State Name' = 'region'))
+summerFatal <- summerFatal %>% right_join(states, by=c('State Name' = 'region'))
 
-myvarstwo <- c("State Name", "FATALS")
+myvarstwo <- c("STATE", "FATALS", "long", "lat", "group")
 summerFatal <- summerFatal[myvarstwo]
 
-summerFatal <- unique(summerFatal)
+ggplot(summerFatal, aes(x=long, y=lat, fill = FATALS)) +
+  geom_polygon(aes(group = group)) +
+  labs(title = "Car Accidents in the Summer by State")
 
-ggplot(data = summerFatal, aes(x=`State Name`, y=FATALS)) + geom_bar(stat = 'identity') + labs(title = "Accidents by State in the Summer", y = "Number of Fatalities")
-
-winterFatal <- winterFatal %>% left_join(glc, by=c('STATE' = 'State Code'))
+winterFatal <- winterFatal %>% left_join(glc2, by=c('STATE' = 'State Code'))
 winterFatal$`State Name` <- tolower(winterFatal$`State Name`)
-winterFatal <- winterFatal %>% left_join(states, by=c('State Name' = 'region'))
+winterFatal <- winterFatal %>% right_join(states, by=c('State Name' = 'region'))
 
-myvarstwo <- c("State Name", "FATALS")
 winterFatal <- winterFatal[myvarstwo]
 
-winterFatal <- unique(winterFatal)
-
-ggplot(data = winterFatal, aes(x=`State Name`, y=FATALS)) + geom_bar(stat = 'identity') + labs(title = "Accidents by State in the Winter", y = "Number of Fatalities")
+ggplot(winterFatal, aes(x=long, y=lat, fill = FATALS)) +
+  geom_polygon(aes(group = group)) +
+  labs(title = "Car Accidents in the Winter by State")
 ```
-I declared winter as October through March and summer as May through August. Winter seems to be more dangerous since there are more car accidents in each state in the Winter. In general whether it is summer or winter, the same states tend to have the most and the least number of fatal car accidents. Texas and California have the most fatal car accidents which makes sens since they are the largest states and there is more traffic.
+I declared winter as October through March and summer as May through August. Winter seems to be more dangerous since there are more car accidents in each state in the Winter. In general whether it is summer or winter, the same states tend to have the most and the least number of fatal car accidents. Texas and California have the most fatal car accidents which makes sense since they are the largest states and there is more traffic. The states with the least number of fatal car accidents are mostly in less populated states such as Montana and Wyoming.

@@ -36,11 +36,14 @@ glc$'City Code' <- as.numeric(glc$`City Code`)
 glc$'County Code' <- as.numeric(glc$`County Code`)
 
 fatalities <- fatalities %>%
-  group_by(STATE) %>%
-  group_by(COUNTY) %>%
+  group_by(STATE, COUNTY) %>%
   summarize(FATALS = sum(FATALS))
 
-fatalities <- fatalities %>% left_join(glc, by=c('COUNTY' = 'County Code'))
+fatalities <- fatalities %>% left_join(glc, by=c('COUNTY' = 'County Code', 'STATE' = 'State Code'))
+
+myvars2 <- c("State Name", "County Name", "FATALS")
+fatalities <- fatalities[myvars2]
+fatalities <- unique(fatalities)
 
 fatalities$`State Name` <- tolower(fatalities$`State Name`)
 fatalities$`County Name` <- tolower(fatalities$`County Name`)
@@ -62,6 +65,10 @@ Winter <- acc %>%
 Summer <- acc %>%
           filter(MONTH > 4 & MONTH < 9)
 
+myvars3 <- c("State Name", "State Code")
+glc2 <- glc[myvars3]
+glc2 <- unique(glc2)
+
 winterFatal <- Winter %>%
   group_by(STATE) %>%
   summarize(FATALS = sum(FATALS))
@@ -70,24 +77,25 @@ summerFatal <- Summer %>%
   group_by(STATE) %>%
   summarize(FATALS = sum(FATALS))
 
-summerFatal <- summerFatal %>% left_join(glc, by=c('STATE' = 'State Code'))
+summerFatal <- summerFatal %>% left_join(glc2, by=c('STATE' = 'State Code'))
 summerFatal$`State Name` <- tolower(summerFatal$`State Name`)
-summerFatal <- summerFatal %>% left_join(states, by=c('State Name' = 'region'))
+summerFatal <- summerFatal %>% right_join(states, by=c('State Name' = 'region'))
 
-myvarstwo <- c("STATE", "FATALS", "long", "lat")
+myvarstwo <- c("STATE", "FATALS", "long", "lat", "group")
 summerFatal <- summerFatal[myvarstwo]
 
-ggplot(summerFatal, aes(x=long, y=lat)) +
-  geom_polygon(aes(fill=FATALS))
+ggplot(summerFatal, aes(x=long, y=lat, fill = FATALS)) +
+  geom_polygon(aes(group = group)) +
+  labs(title = "Car Accidents in the Summer by State")
 
-winterFatal <- winterFatal %>% left_join(glc, by=c('STATE' = 'State Code'))
+winterFatal <- winterFatal %>% left_join(glc2, by=c('STATE' = 'State Code'))
 winterFatal$`State Name` <- tolower(winterFatal$`State Name`)
-winterFatal <- winterFatal %>% left_join(states, by=c('State Name' = 'region'))
+winterFatal <- winterFatal %>% right_join(states, by=c('State Name' = 'region'))
 
-myvarstwo <- c("STATE", "FATALS", "long", "lat")
 winterFatal <- winterFatal[myvarstwo]
 
-ggplot(winterFatal, aes(x=long, y=lat)) +
-  geom_polygon(aes(fill=FATALS))
+ggplot(winterFatal, aes(x=long, y=lat, fill = FATALS)) +
+  geom_polygon(aes(group = group)) +
+  labs(title = "Car Accidents in the Winter by State")
 
 ```
