@@ -10,6 +10,7 @@ author: Mario Lloyd Galvao-Wilson, Justin Park, and Brian Sayre
 library(tidyverse)
 library(ggplot2)
 library(lubridate)
+library(readxl)
 
 acc <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/accident.csv", stringsAsFactors = FALSE)
 
@@ -104,6 +105,12 @@ ggplot(grouped,aes(x=HOUR, y=numAccidents)) +
 
 In terms of sex I found that both men and women accidents are the most common and men are right behind. You can see that women is much lower than both other categories. In terms of the hour of the day we can see that accidents usually peak later at night and really dip in the mornings.
 
+```{R}
+glc <- read_xlsx("FRPP_GLC_-_United_StATESaPRIL62021.xlsx")
+states <- map_data('state')
+counties <- map_data('county')
+```
+
 ### Question 7
 ```{R}
 myvars <- c("STATE", "COUNTY", "FATALS")
@@ -167,5 +174,5 @@ winterFatal <- winterFatal[myvarstwo]
 
 ggplot(winterFatal, aes(x=long, y=lat)) +
   geom_polygon(aes(fill=FATALS))
-
 ```
+My computer is unable to process this much data. I do not know what else I can do since I am not getting a syntax error but cannot plot my data.
