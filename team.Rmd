@@ -159,20 +159,22 @@ summerFatal <- summerFatal %>% left_join(glc, by=c('STATE' = 'State Code'))
 summerFatal$`State Name` <- tolower(summerFatal$`State Name`)
 summerFatal <- summerFatal %>% left_join(states, by=c('State Name' = 'region'))
 
-myvarstwo <- c("STATE", "FATALS", "long", "lat")
+myvarstwo <- c("State Name", "FATALS")
 summerFatal <- summerFatal[myvarstwo]
 
-ggplot(summerFatal, aes(x=long, y=lat)) +
-  geom_polygon(aes(fill=FATALS))
+summerFatal <- unique(summerFatal)
+
+ggplot(data = summerFatal, aes(x=`State Name`, y=FATALS)) + geom_bar(stat = 'identity') + labs(title = "Accidents by State in the Summer", y = "Number of Fatalities")
 
 winterFatal <- winterFatal %>% left_join(glc, by=c('STATE' = 'State Code'))
 winterFatal$`State Name` <- tolower(winterFatal$`State Name`)
 winterFatal <- winterFatal %>% left_join(states, by=c('State Name' = 'region'))
 
-myvarstwo <- c("STATE", "FATALS", "long", "lat")
+myvarstwo <- c("State Name", "FATALS")
 winterFatal <- winterFatal[myvarstwo]
 
-ggplot(winterFatal, aes(x=long, y=lat)) +
-  geom_polygon(aes(fill=FATALS))
+winterFatal <- unique(winterFatal)
+
+ggplot(data = winterFatal, aes(x=`State Name`, y=FATALS)) + geom_bar(stat = 'identity') + labs(title = "Accidents by State in the Winter", y = "Number of Fatalities")
 ```
-My computer is unable to process this much data. I do not know what else I can do since I am not getting a syntax error but cannot plot my data.
+I declared winter as October through March and summer as May through August. Winter seems to be more dangerous since there are more car accidents in each state in the Winter. In general whether it is summer or winter, the same states tend to have the most and the least number of fatal car accidents. Texas and California have the most fatal car accidents which makes sens since they are the largest states and there is more traffic.
