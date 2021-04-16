@@ -35,8 +35,6 @@ glc$'State Code' <- as.numeric(glc$`State Code`)
 glc$'City Code' <- as.numeric(glc$`City Code`)
 glc$'County Code' <- as.numeric(glc$`County Code`)
 
-#fatalities <- fatalities %>% left_join(glc, by=c('COUNTY' = 'County Code', 'STATE' = 'State Code'))
-
 fatalities <- fatalities %>%
   group_by(STATE) %>%
   group_by(COUNTY) %>%
@@ -55,3 +53,41 @@ ggplot(fatalities, aes(x=long, y=lat)) +
 ```
 
 There are some large areas on the map that have "holes" where there have been no reported fatal car accidents. This makes sense since certain parts of the country do not have a lot of traffic such as mountains in Colorado, New Mexico, and Arizona. You would also not expect to see many fatal car accidents in cities since people do not drive very fast in areas there is a lot of traffic.
+
+Problem 8
+```{R}
+Winter <- acc %>%
+          filter(MONTH  < 4 | MONTH > 9)
+
+Summer <- acc %>%
+          filter(MONTH > 4 & MONTH < 9)
+
+winterFatal <- Winter %>%
+  group_by(STATE) %>%
+  summarize(FATALS = sum(FATALS))
+
+summerFatal <- Summer %>%
+  group_by(STATE) %>%
+  summarize(FATALS = sum(FATALS))
+
+summerFatal <- summerFatal %>% left_join(glc, by=c('STATE' = 'State Code'))
+summerFatal$`State Name` <- tolower(summerFatal$`State Name`)
+summerFatal <- summerFatal %>% left_join(states, by=c('State Name' = 'region'))
+
+myvarstwo <- c("STATE", "FATALS", "long", "lat")
+summerFatal <- summerFatal[myvarstwo]
+
+ggplot(summerFatal, aes(x=long, y=lat)) +
+  geom_polygon(aes(fill=FATALS))
+
+winterFatal <- winterFatal %>% left_join(glc, by=c('STATE' = 'State Code'))
+winterFatal$`State Name` <- tolower(winterFatal$`State Name`)
+winterFatal <- winterFatal %>% left_join(states, by=c('State Name' = 'region'))
+
+myvarstwo <- c("STATE", "FATALS", "long", "lat")
+winterFatal <- winterFatal[myvarstwo]
+
+ggplot(winterFatal, aes(x=long, y=lat)) +
+  geom_polygon(aes(fill=FATALS))
+
+```
