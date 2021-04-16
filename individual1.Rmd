@@ -22,33 +22,36 @@ library(maps)
 acc <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/accident.csv", stringsAsFactors = FALSE)
 person <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/person.csv", stringsAsFactors = FALSE)
 glc <- read_xlsx("FRPP_GLC_-_United_StATESaPRIL62021.xlsx")
+states <- map_data('state')
+counties <- map_data('county')
 ```
 
 Problem 7
 ```{R}
-myvars <- c("STATE", "COUNTY", "CITY", "FATALS")
+myvars <- c("STATE", "COUNTY", "FATALS")
 fatalities <- acc[myvars]
 
 glc$'State Code' <- as.numeric(glc$`State Code`)
 glc$'City Code' <- as.numeric(glc$`City Code`)
 glc$'County Code' <- as.numeric(glc$`County Code`)
 
-fatalities <- fatalities %>% left_join(glc, by=c('COUNTY' = 'County Code', 'STATE' = 'State Code'))
+#fatalities <- fatalities %>% left_join(glc, by=c('COUNTY' = 'County Code', 'STATE' = 'State Code'))
+
+fatalities <- fatalities %>%
+  group_by(STATE) %>%
+  group_by(COUNTY) %>%
+  summarize(FATALS = sum(FATALS))
+
+fatalities <- fatalities %>% left_join(glc, by=c('COUNTY' = 'County Code'))
 
 fatalities$`State Name` <- tolower(fatalities$`State Name`)
 fatalities$`County Name` <- tolower(fatalities$`County Name`)
 
-#myvarstwo <- c("STATE","COUNTY" , "FATALS", "County Name", "State Name")
-#newfatalities <- fatalities[myvarstwo]
-
-#newfatalities <- unique(newfatalities)
-
 fatalities <- fatalities %>% right_join(counties, by=c('County Name' = 'subregion', 'State Name' = 'region'))
 
-states <- map_data('state')
-counties <- map_data('county')
-ggplot(states, aes(x=long, y=lat)) + geom_path(aes(group=group))
-
 ggplot(fatalities, aes(x=long, y=lat)) + 
+  geom_polygon(aes(group=group)) +
   geom_polygon(aes(group=group, fill=FATALS))
 ```
+
+There are some large areas on the map that have "holes" where there have been no reported fatal car accidents. This makes sense since certain parts of the country do not have a lot of traffic such as mountains in Colorado, New Mexico, and Arizona. You would also not expect to see many fatal car accidents in cities since people do not drive very fast in areas there is a lot of traffic.
